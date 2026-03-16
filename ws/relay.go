@@ -48,7 +48,19 @@ func NewRelayClient(apiBase string) (*RelayClient, error) {
 	if err != nil {
 		return nil, fmt.Errorf("dial relay %s: %w", sr.RelayURL, err)
 	}
-	return &RelayClient{sessionID: sr.SessionID, conn: conn}, nil
+	rc := &RelayClient{sessionID: sr.SessionID, conn: conn}
+	go rc.readPump()
+	return rc, nil
+}
+
+// readPump drains incoming frames from the relay server so the connection
+// stays alive through server-side ping/pong keepalives.
+func (rc *RelayClient) readPump() {
+	for {
+		if _, _, err := rc.conn.ReadMessage(); err != nil {
+			return
+		}
+	}
 }
 
 // SessionID returns the relay session ID assigned by the server.

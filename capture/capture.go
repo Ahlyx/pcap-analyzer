@@ -2,7 +2,6 @@ package capture
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/pcap"
@@ -51,21 +50,22 @@ func (c *Capture) Start(out chan<- gopacket.Packet) {
 		src := gopacket.NewPacketSource(c.handle, c.handle.LinkType())
 		src.DecodeOptions = gopacket.Default
 
-		packets := src.Packets()
 		for {
-			select {
-			case <-c.done:
-				return
-			case pkt, ok := <-packets:
-				if !ok {
-					log.Println("capture: packet source closed")
-					return
-				}
+			pkt, err := src.NextPacket()
+			if err != nil {
+				// If Stop() was called, handle.Close() unblocks NextPacket with an error — exit cleanly.
 				select {
-				case out <- pkt:
 				case <-c.done:
 					return
+				default:
 				}
+				// Transient decode error (e.g. truncated packet) — skip and continue.
+				continue
+			}
+			select {
+			case out <- pkt:
+			case <-c.done:
+				return
 			}
 		}
 	}()

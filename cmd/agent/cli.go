@@ -145,6 +145,7 @@ func runAnalysisPipeline(broadcast func(interface{}), pktCh <-chan gopacket.Pack
 	defer statsTicker.Stop()
 	defer alertTicker.Stop()
 
+	log.Printf("pipeline started")
 	var totalPackets, totalBytes uint64
 
 	for {

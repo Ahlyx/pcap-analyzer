@@ -64,6 +64,10 @@ func (rc *RelayClient) Broadcast(msg interface{}) {
 		log.Printf("relay: marshal error: %v", err)
 		return
 	}
+	if err := rc.conn.SetWriteDeadline(time.Now().Add(10 * time.Second)); err != nil {
+		log.Println("relay: connection lost — exiting")
+		os.Exit(1)
+	}
 	if err := rc.conn.WriteMessage(websocket.TextMessage, data); err != nil {
 		log.Println("relay: connection lost — exiting")
 		os.Exit(1)

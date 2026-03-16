@@ -5,8 +5,8 @@ import "time"
 // FlowMessage represents a network flow between two endpoints.
 type FlowMessage struct {
 	Type      string    `json:"type"`
-	SrcIP     string    `json:"src_ip"`
-	DstIP     string    `json:"dst_ip"`
+	SrcIP     string    `json:"src"`
+	DstIP     string    `json:"dst"`
 	SrcPort   uint16    `json:"src_port"`
 	DstPort   uint16    `json:"dst_port"`
 	Protocol  string    `json:"protocol"`

@@ -70,13 +70,6 @@ func runStart(cmd *cobra.Command, args []string) error {
 		log.Printf("auto-selected interface: %s", iface)
 	}
 
-	mode := "local"
-	if flagRelay {
-		mode = "relay"
-	}
-	sess := session.NewSession(mode, iface)
-	log.Println(sess)
-
 	cfg := capture.Config{
 		Interface:   iface,
 		Filter:      capture.DefaultFilter(),
@@ -116,6 +109,8 @@ func runStart(cmd *cobra.Command, args []string) error {
 	}
 
 	// Local mode.
+	sess := session.NewSession("local", iface)
+
 	hub := ws.NewHub()
 	go hub.Run()
 
